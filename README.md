@@ -1,55 +1,54 @@
-Green Score Live Tracker
-Green Score Live Tracker est une application web interactive développée avec R et Shiny. Elle permet d'analyser en temps réel l'impact nutritionnel et environnemental des produits alimentaires à travers le monde en interrogeant directement l'API d'Open Food Facts.
+☘️ Nutri-Eco Intelligence Dashboard
+Nutri-Eco Intelligence Dashboard est une plateforme d'analyse multidimensionnelle conçue pour transformer la complexité des données alimentaires en insights actionnables. L'application interroge en temps réel l'API mondiale d'Open Food Facts pour croiser santé, écologie et transformation industrielle.
 
-Fonctionnalités
-Recherche en temps réel : Accès direct à la base de données mondiale d'Open Food Facts (v2).
+🚀 Vision du Projet
+L'objectif est de dépasser l'analyse simple pour proposer une vision à 360° du produit :
+
+Qualité Nutritionnelle (Nutri-Score)
+
+Impact Environnemental (Eco-Score)
+
+Niveau de Transformation (Score NOVA)
+
+📊 Fonctionnalités Avancées
+Analyse Bivariée (Heatmap) : Une matrice de corrélation dynamique croisant le Nutri-Score et l'Eco-Score pour identifier les produits "Sains et Durables" versus les paradoxes alimentaires.
+
+Monitoring de l'Ultra-Transformation : Calcul en temps réel du taux de produits NOVA 4 (aliments ultra-transformés) sur l'échantillon analysé.
 
 Indicateurs Clés (KPIs) :
 
-Nombre total de produits référencés en base pour la recherche.
+Volume total de données disponibles en base mondiale pour la requête.
 
-Calcul du Nutri-Score majoritaire sur les résultats.
+Détermination automatique des scores dominants (Mode statistique).
 
-Calcul de l'Eco-Score majoritaire sur les résultats.
+Taux de transformation industrielle global.
 
-Visualisations Dynamiques :
+Explorateur de Données : Tableau interactif détaillé permettant de vérifier chaque référence individuelle.
 
-Graphique de répartition des grades Nutri-Score (Santé).
+🛠️ Stack Technique
+Framework : Shiny (R) avec thème bslib pour une interface réactive.
 
-Graphique de répartition des grades Eco-Score (Environnement).
+Data Pipeline :
 
-Explorateur de Données : Tableau détaillé des produits incluant le nom, la marque et les scores respectifs.
+httr2 : Requêtage asynchrone de l'API REST Open Food Facts v2.
 
-Technologies utilisées
-Langage : R
+jsonlite : Parsing et normalisation des flux JSON.
 
-Interface : Shiny avec le thème bslib (Bootswatch "Minty").
+tidyverse & dplyr : Pipeline de nettoyage (Data Wrangling) et calculs statistiques.
 
-API : Open Food Facts API v2.
+ggplot2 : Visualisations bivariées et distribution de fréquences.
 
-Packages R principaux :
-
-httr2 : Pour les requêtes HTTP vers l'API.
-
-jsonlite : Pour le traitement des données au format JSON.
-
-tidyverse (ggplot2, dplyr) : Pour la manipulation et la visualisation des données.
-
-DT : Pour les tableaux interactifs.
-
-Installation
-Pour lancer l'application localement, assurez-vous d'avoir R installé, puis exécutez les commandes suivantes dans votre console R :
-
+📦 Installation et Lancement
 R
-# Installation des packages nécessaires
+# 1. Installation des dépendances
 install.packages(c("shiny", "httr2", "jsonlite", "tidyverse", "bslib", "DT"))
 
-# Lancer l'application
-# Copiez le code du fichier app.R et lancez :
+# 2. Lancement
+# Exécuter le fichier app.R dans RStudio
 shiny::runApp()
-Utilisation
-Entrez un mot-clé dans la barre latérale (ex: "Oreo", "Biscuits", "Jus d'orange").
+📈 Perspectives IA & Data Science
+NLP (Natural Language Processing) : Analyse automatisée des listes d'ingrédients pour détecter les additifs controversés.
 
-Cliquez sur le bouton "Lancer la recherche".
+Machine Learning : Implémentation de modèles d'imputation pour prédire les scores manquants à partir des profils nutritionnels.
 
-L'application interroge l'API, récupère le volume total de produits en base et analyse les 100 résultats les plus pertinents pour générer les graphiques de tendance.
+Clustering : Segmentation des produits par profil de nutriments via K-means.
