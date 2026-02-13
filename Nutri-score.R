@@ -5,9 +5,12 @@ library(tidyverse)
 library(bslib)
 library(DT)
 
+# Definition de l'interface utilisateur
 ui <- page_sidebar(
   theme = bs_theme(bootswatch = "minty", primary = "#2ecc71"),
-  title = "☘️ Nutri-Eco Intelligence Dashboard",
+  title = "Nutri-Eco Intelligence Dashboard",
+  
+  # Barre latérale pour la recherche
   sidebar = sidebar(
     title = "Data Acquisition",
     textInput("query", "Requête API :", value = "oreo"),
@@ -16,6 +19,7 @@ ui <- page_sidebar(
     helpText("Analyse multidimensionnelle : Nutriscore, Ecoscore et NOVA.")
   ),
   
+  # Affichage des compteurs principaux (KPIs)
   layout_column_wrap(
     width = 1/4, gap = "15px",
     value_box(title = "Volume Data Total", value = textOutput("total_count"), showcase = icon("database"), theme = "primary"),
@@ -24,22 +28,25 @@ ui <- page_sidebar(
     value_box(title = "Taux Ultra-Transformé", value = textOutput("nova_rate"), showcase = icon("industry"), theme = "danger")
   ),
   
+  # Section des graphiques
   layout_column_wrap(
     width = 1/2, gap = "20px",
-    card(card_header("🎯 Analyse Bivariée"), card_body(plotOutput("crossPlot"))),
-    card(card_header("🏭 Profil NOVA"), card_body(plotOutput("novaPlot")))
+    card(card_header("Analyse Bivariée"), card_body(plotOutput("crossPlot"))),
+    card(card_header("Profil NOVA"), card_body(plotOutput("novaPlot")))
   ),
   
-  card(card_header("🔍 Dataset Structuré"), card_body(DTOutput("tableAPI")))
+  # Tableau de données brut
+  card(card_header("Dataset Structuré"), card_body(DTOutput("tableAPI")))
 )
 
 server <- function(input, output) {
   
-  # 1. Capture de la donnée brute
+  # Récupération des données sur l'API Open Food Facts
   raw_data <- eventReactive(input$go, {
     req_url <- paste0("https://world.openfoodfacts.org/cgi/search.pl?search_terms=", 
                       URLencode(input$query), "&search_simple=1&action=process&json=1&page_size=100")
     
+    # Sécurité pour éviter les erreurs de connexion
     tryCatch({
       resp <- request(req_url) %>% req_perform()
       res_json <- resp %>% resp_body_json()
@@ -47,11 +54,12 @@ server <- function(input, output) {
     }, error = function(e) return(NULL))
   }, ignoreNULL = FALSE)
   
-  # 2. Transformation en Data Frame propre
+  # Nettoyage et mise en forme des données reçues
   processed_df <- reactive({
     data <- raw_data()
     if (is.null(data) || length(data$products) == 0) return(NULL)
     
+    # On crée un tableau propre avec les colonnes qui nous intéressent
     df <- map_df(data$products, ~{
       list(
         Nom = as.character(.x$product_name %||% "Inconnu"),
@@ -64,13 +72,14 @@ server <- function(input, output) {
     return(df)
   })
   
-  # --- OUTPUTS TEXTUELS ---
+  # Affichage du nombre total de produits trouvés en base
   output$total_count <- renderText({
     data <- raw_data()
     if(is.null(data)) return("0")
     return(as.character(format(data$count, big.mark = " ")))
   })
   
+  # Calcul du Nutri-Score le plus fréquent
   output$avg_nutri <- renderText({
     df <- processed_df()
     if(is.null(df)) return("-")
@@ -80,6 +89,7 @@ server <- function(input, output) {
     return(as.character(res$Nutri[1]))
   })
   
+  # Calcul de l'Eco-Score le plus fréquent
   output$avg_eco <- renderText({
     df <- processed_df()
     if(is.null(df)) return("-")
@@ -89,6 +99,7 @@ server <- function(input, output) {
     return(as.character(res$Eco[1]))
   })
   
+  # Calcul du pourcentage de produits ultra-transformés (Nova 4)
   output$nova_rate <- renderText({
     df <- processed_df()
     if(is.null(df)) return("0%")
@@ -98,7 +109,7 @@ server <- function(input, output) {
     return(paste0(round((nova4/total)*100, 1), "%"))
   })
   
-  # --- OUTPUTS GRAPHIQUES ---
+  # Graphique croisant Nutri-Score et Eco-Score
   output$crossPlot <- renderPlot({
     df <- processed_df()
     if(is.null(df)) return(NULL)
@@ -111,6 +122,7 @@ server <- function(input, output) {
       labs(x = "Nutri-Score", y = "Eco-Score", size = "Effectif")
   })
   
+  # Graphique en barres pour la répartition NOVA
   output$novaPlot <- renderPlot({
     df <- processed_df()
     if(is.null(df)) return(NULL)
@@ -123,7 +135,7 @@ server <- function(input, output) {
       theme_minimal() + labs(x = "Score NOVA", y = "Nombre", fill = "Groupe")
   })
   
-  # --- TABLEAU ---
+  # Rendu du tableau de données interactif
   output$tableAPI <- renderDT({
     df <- processed_df()
     if(is.null(df)) return(datatable(data.frame(Info = "Aucune donnée")))
